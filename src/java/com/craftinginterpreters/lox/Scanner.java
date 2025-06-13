@@ -81,9 +81,6 @@ class Scanner {
                     // A comment goes until the end of the line.
                     while (peek() != '\n' && !isAtEnd()) advance();
 
-                } else if (isAlpha(c)) {
-                    identifier();
-
                 } else {
                     addToken(SLASH);
                 }
@@ -104,6 +101,9 @@ class Scanner {
             default:
                 if (isDigit(c)) {
                     number();
+                } else if (isAlpha(c)) {
+                    identifier();
+
                 } else {
                     Lox.error(line, "Unexpected character.");
                 }
