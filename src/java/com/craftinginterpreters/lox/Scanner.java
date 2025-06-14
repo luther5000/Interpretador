@@ -118,10 +118,9 @@ class Scanner {
             if (isAtEnd())
                 Lox.error(line, "Unexpected end of comment.");
 
-            if (peek() == '*')
-                if (peekNext() == '/') return;
-
             if (peek() == '\n') ++line;
+
+            if (match('*') && match('/')) return;
 
             advance();
         }
