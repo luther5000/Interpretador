@@ -115,12 +115,14 @@ class Scanner {
 
     private void cComment() {
         while (true) {
-            if (isAtEnd())
+            if (isAtEnd()) {
                 Lox.error(line, "Unexpected end of comment.");
-
-            if (peek() == '\n') ++line;
+                return;
+            }
 
             if (match('*') && match('/')) return;
+
+            if (peek() == '\n') ++line;
 
             advance();
         }
