@@ -28,8 +28,10 @@ class Parser {
 
     private Expr comma(){
         if (match(COMMA)){
-            Lox.error(previous(), "Unexpected operator " + previous().lexeme + ".");
+            Lox.error(previous(), "Unexpected operator.");
             ternary();
+
+            if (isAtEnd()) return null;
         }
 
         Expr expr = ternary();
@@ -45,12 +47,16 @@ class Parser {
 
     private Expr ternary(){
         if (match(INTERROGATION)) {
-            Lox.error(previous(), "Unexpected operator " + previous().lexeme + ".");
+            Lox.error(previous(), "Unexpected operator.");
             equality();
+
+            if (isAtEnd()) return null;
         }
         if (match(COLON)) {
-            Lox.error(previous(), "Unexpected operator " + previous().lexeme + ".");
+            Lox.error(previous(), "Unexpected operator.");
             equality();
+
+            if (isAtEnd()) return null;
         }
 
         Expr expr = equality();
@@ -69,13 +75,20 @@ class Parser {
             return new Expr.Binary(expr, operator, new Expr.Binary(left, operator2, right));
         }
 
+        if (match(COLON)) {
+            Lox.error(previous(), "Unexpected operator.");
+            equality();
+        }
+
         return expr;
     }
 
     private Expr equality() {
         if (match(BANG_EQUAL, EQUAL_EQUAL)) {
-            Lox.error(previous(), "Unexpected operator " + previous().lexeme + ".");
+            Lox.error(previous(), "Unexpected operator.");
             comparison();
+
+            if (isAtEnd()) return null;
         }
 
         Expr expr = comparison();
@@ -91,8 +104,10 @@ class Parser {
 
     private Expr comparison() {
         if (match(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL)){
-            Lox.error(previous(), "Unexpected operator " + previous().lexeme + ".");
+            Lox.error(previous(), "Unexpected operator.");
             term();
+
+            if (isAtEnd()) return null;
         }
 
         Expr expr = term();
@@ -108,8 +123,10 @@ class Parser {
 
     private Expr term() {
         if (match(MINUS, PLUS)){
-            Lox.error(previous(), "Unexpected operator " + previous().lexeme + ".");
+            Lox.error(previous(), "Unexpected operator.");
             factor();
+
+            if (isAtEnd()) return null;
         }
 
         Expr expr = factor();
@@ -125,8 +142,10 @@ class Parser {
 
     private Expr factor() {
         if (match(SLASH, STAR)){
-            Lox.error(previous(), "Unexpected operator " + previous().lexeme + ".");
+            Lox.error(previous(), "Unexpected operator.");
             unary();
+
+            if (isAtEnd()) return null;
         }
 
         Expr expr = unary();
