@@ -27,6 +27,11 @@ class Parser {
     }
 
     private Expr comma(){
+        if (match(COMMA)){
+            Lox.error(previous(), "Unexpected operator " + previous().lexeme + ".");
+            ternary();
+        }
+
         Expr expr = ternary();
 
         while (match(COMMA)) {
@@ -39,6 +44,15 @@ class Parser {
     }
 
     private Expr ternary(){
+        if (match(INTERROGATION)) {
+            Lox.error(previous(), "Unexpected operator " + previous().lexeme + ".");
+            equality();
+        }
+        if (match(COLON)) {
+            Lox.error(previous(), "Unexpected operator " + previous().lexeme + ".");
+            equality();
+        }
+
         Expr expr = equality();
 
         if (match(INTERROGATION)){
@@ -59,6 +73,11 @@ class Parser {
     }
 
     private Expr equality() {
+        if (match(BANG_EQUAL, EQUAL_EQUAL)) {
+            Lox.error(previous(), "Unexpected operator " + previous().lexeme + ".");
+            comparison();
+        }
+
         Expr expr = comparison();
 
         while (match(BANG_EQUAL, EQUAL_EQUAL)) {
@@ -71,6 +90,11 @@ class Parser {
     }
 
     private Expr comparison() {
+        if (match(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL)){
+            Lox.error(previous(), "Unexpected operator " + previous().lexeme + ".");
+            term();
+        }
+
         Expr expr = term();
 
         while (match(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL)) {
@@ -83,6 +107,11 @@ class Parser {
     }
 
     private Expr term() {
+        if (match(MINUS, PLUS)){
+            Lox.error(previous(), "Unexpected operator " + previous().lexeme + ".");
+            factor();
+        }
+
         Expr expr = factor();
 
         while (match(MINUS, PLUS)) {
@@ -95,6 +124,11 @@ class Parser {
     }
 
     private Expr factor() {
+        if (match(SLASH, STAR)){
+            Lox.error(previous(), "Unexpected operator " + previous().lexeme + ".");
+            unary();
+        }
+
         Expr expr = unary();
 
         while (match(SLASH, STAR)) {
