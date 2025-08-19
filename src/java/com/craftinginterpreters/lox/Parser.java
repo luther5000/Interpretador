@@ -1,6 +1,7 @@
 package com.craftinginterpreters.lox;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import static com.craftinginterpreters.lox.TokenType.*;
 
@@ -27,12 +28,7 @@ class Parser {
     }
 
     private Expr comma(){
-        if (match(COMMA)){
-            Lox.error(previous(), "Unexpected operator.");
-            ternary();
-
-            if (isAtEnd()) return null;
-        }
+        if (checkBynaryOperator(this::ternary, COMMA)) return null;
 
         Expr expr = ternary();
 
@@ -46,18 +42,8 @@ class Parser {
     }
 
     private Expr ternary(){
-        if (match(INTERROGATION)) {
-            Lox.error(previous(), "Unexpected operator.");
-            equality();
-
-            if (isAtEnd()) return null;
-        }
-        if (match(COLON)) {
-            Lox.error(previous(), "Unexpected operator.");
-            equality();
-
-            if (isAtEnd()) return null;
-        }
+        if (checkBynaryOperator(this::equality, INTERROGATION)) return null;
+        if (checkBynaryOperator(this::equality, COLON)) return null;
 
         Expr expr = equality();
 
@@ -84,12 +70,7 @@ class Parser {
     }
 
     private Expr equality() {
-        if (match(BANG_EQUAL, EQUAL_EQUAL)) {
-            Lox.error(previous(), "Unexpected operator.");
-            comparison();
-
-            if (isAtEnd()) return null;
-        }
+        if (checkBynaryOperator(this::comparison, BANG_EQUAL, EQUAL_EQUAL)) return null;
 
         Expr expr = comparison();
 
@@ -103,12 +84,8 @@ class Parser {
     }
 
     private Expr comparison() {
-        if (match(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL)){
-            Lox.error(previous(), "Unexpected operator.");
-            term();
-
-            if (isAtEnd()) return null;
-        }
+        if (checkBynaryOperator(this::term, GREATER, GREATER_EQUAL, LESS, LESS_EQUAL))
+            return null;
 
         Expr expr = term();
 
@@ -122,12 +99,7 @@ class Parser {
     }
 
     private Expr term() {
-        if (match(MINUS, PLUS)){
-            Lox.error(previous(), "Unexpected operator.");
-            factor();
-
-            if (isAtEnd()) return null;
-        }
+        if (checkBynaryOperator(this::factor, MINUS, PLUS)) return null;
 
         Expr expr = factor();
 
@@ -141,12 +113,7 @@ class Parser {
     }
 
     private Expr factor() {
-        if (match(SLASH, STAR)){
-            Lox.error(previous(), "Unexpected operator.");
-            unary();
-
-            if (isAtEnd()) return null;
-        }
+        if (checkBynaryOperator(this::unary, SLASH, STAR)) return null;
 
         Expr expr = unary();
 
@@ -251,6 +218,17 @@ class Parser {
 
             advance();
         }
+    }
+
+    private boolean checkBynaryOperator(Supplier<Expr> func, TokenType... types) {
+        if (match(types)){
+            Lox.error(previous(), "Unexpected operator.");
+            func.get();
+
+            return isAtEnd();
+        }
+
+        return false;
     }
 
 }
