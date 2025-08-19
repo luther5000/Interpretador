@@ -42,14 +42,12 @@ class Parser {
     }
 
     private Expr ternary(){
-        if (checkBynaryOperator(this::equality, INTERROGATION)) return null;
-        if (checkBynaryOperator(this::equality, COLON)) return null;
+        Expr left = equality();
 
-        Expr expr = equality();
-
-        if (match(INTERROGATION)){
+        while (match(INTERROGATION)){
             Token operator = previous();
-            Expr left = equality();
+            // Quebrando todas as regras pra implementar essa bomba de operador ternário
+            Expr middle = expression();
 
             if (!match(COLON)){
                 throw error(peek(), "Expected  ':' (COLON) for the ternary operator.");
@@ -58,15 +56,10 @@ class Parser {
             Token operator2 = previous();
             Expr right = equality();
 
-            return new Expr.Binary(expr, operator, new Expr.Binary(left, operator2, right));
+            left = new Expr.Ternary(left, operator, middle, operator2, right);
         }
 
-        if (match(COLON)) {
-            Lox.error(previous(), "Unexpected operator.");
-            equality();
-        }
-
-        return expr;
+        return left;
     }
 
     private Expr equality() {

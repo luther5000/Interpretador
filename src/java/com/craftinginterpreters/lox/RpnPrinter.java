@@ -39,6 +39,17 @@ public class RpnPrinter implements Expr.Visitor<String> {
         return builder.toString();
     }
 
+    public String visitTernaryExpr(Expr.Ternary expr){
+        StringBuilder builder = new StringBuilder();
+
+        builder.append(expr.left.accept(this) + " ");
+        builder.append(expr.middle.accept(this) + " ");
+        builder.append(expr.right.accept(this) + " ");
+        builder.append(expr.operator1.literal + " ");
+
+        return builder.toString();
+    }
+
 
     public static void main(String[] args){
         Expr expr = new Expr.Binary(
