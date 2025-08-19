@@ -27,12 +27,32 @@ class Parser {
     }
 
     private Expr comma(){
-        Expr expr = equality();
+        Expr expr = ternary();
 
         while (match(COMMA)) {
             Token operator = previous();
-            Expr right = equality();
+            Expr right = ternary();
             expr = new Expr.Binary(expr, operator, right);
+        }
+
+        return expr;
+    }
+
+    private Expr ternary(){
+        Expr expr = equality();
+
+        if (match(INTERROGATION)){
+            Token operator = previous();
+            Expr left = equality();
+
+            if (!match(COLON)){
+                throw error(peek(), "Expected  ':' (COLON) for the ternary operator.");
+            }
+
+            Token operator2 = previous();
+            Expr right = equality();
+
+            return new Expr.Binary(expr, operator, new Expr.Binary(left, operator2, right));
         }
 
         return expr;
