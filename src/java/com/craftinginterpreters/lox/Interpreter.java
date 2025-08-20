@@ -53,6 +53,7 @@ class Interpreter implements Expr.Visitor<Object> {
                         "Operands must be two numbers or at least one string.");
             case SLASH:
                 checkNumberOperands(expr.operator, left, right);
+                checkDivisionByZero(expr.operator, right);
                 return (double)left / (double)right;
             case STAR:
                 checkNumberOperands(expr.operator, left, right);
@@ -139,5 +140,10 @@ class Interpreter implements Expr.Visitor<Object> {
         }
 
         return object.toString();
+    }
+
+    private void checkDivisionByZero(Token operator, Object right) {
+        if ((Double)right == 0)
+            throw new RuntimeError(operator, "Division by zero.");
     }
 }
