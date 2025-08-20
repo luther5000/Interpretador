@@ -57,6 +57,8 @@ class Interpreter implements Expr.Visitor<Object> {
 
             case BANG_EQUAL: return !isEqual(left, right);
             case EQUAL_EQUAL: return isEqual(left, right);
+
+            case COMMA: return right;
         }
 
         // Unreachable.
@@ -87,6 +89,14 @@ class Interpreter implements Expr.Visitor<Object> {
     @Override
     public Object visitGroupingExpr(Expr.Grouping expr) {
         return evaluate(expr.expression);
+    }
+
+    @Override
+    public Object visitTernaryExpr(Expr.Ternary expr) {
+        if (isTruthy(evaluate(expr.left)))
+            return evaluate(expr.middle);
+        else
+            return evaluate(expr.right);
     }
 
     private void checkNumberOperand(Token operator, Object operand) {
