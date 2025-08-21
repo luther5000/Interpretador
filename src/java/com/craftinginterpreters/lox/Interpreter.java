@@ -1,5 +1,7 @@
 package com.craftinginterpreters.lox;
 
+import java.util.function.Supplier;
+
 class Interpreter implements Expr.Visitor<Object> {
 
     void interpret(Expr expression) {
@@ -22,17 +24,15 @@ class Interpreter implements Expr.Visitor<Object> {
 
         switch (expr.operator.type) {
             case GREATER:
-                checkNumberOperands(expr.operator, left, right);
-                return (double)left > (double)right;
+                return compare(left, right) == 1;
             case GREATER_EQUAL:
-                checkNumberOperands(expr.operator, left, right);
-                return (double)left >= (double)right;
+                int a = compare(left, right);
+                return a == 0 || a == 1;
             case LESS:
-                checkNumberOperands(expr.operator, left, right);
-                return (double)left < (double)right;
+                return compare(left, right) == -1;
             case LESS_EQUAL:
-                checkNumberOperands(expr.operator, left, right);
-                return (double)left <= (double)right;
+                int b = compare(left, right);
+                return b == 0 || b == -1;
 
             case MINUS:
                 checkNumberOperands(expr.operator, left, right);
@@ -145,5 +145,23 @@ class Interpreter implements Expr.Visitor<Object> {
     private void checkDivisionByZero(Token operator, Object right) {
         if ((Double)right == 0)
             throw new RuntimeError(operator, "Division by zero.");
+    }
+
+    /***
+    Returns 0 if equal, 1 if greater and -1 if less. Returns 2 in case
+    you can't compare both values.
+     */
+    private int compare(Object left, Object right) {
+        if (left == null || right == null) return 2;
+
+        if (left instanceof Double && right instanceof Double)
+            return ((Double)left).compareTo((Double)right);
+
+        if (left instanceof String && right instanceof String) {
+            int a = ((String)left).compareTo((String)right);
+            return Integer.compare(a, 0);
+        }
+
+        return 2;
     }
 }
